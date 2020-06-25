@@ -61,5 +61,26 @@ git add 文件名
 git commit -m "change 文件名"
 ```
 
+同样，上传后，可以通过`git log`来查看这次修改操作的log
+
+### 查看 unstaged
+
+想查看还没`add`(unstaged状态)的修改部分和上个已经`commit`的文件有何不同，可以使用：
+
+`git diff`
+
+### 查看staged(--cached)
+
+如果已经`add`了这次修改，文件变成了“可提交状态”(staged)，我们可以在diff中添加参数`--cached`来查看修改：
+
+`git diff --cached`
+
+### 查看 unstaged&staged(HEAD)
+
+可以通过使用`git diff HEAD`同时查看`add`过(staged)和没`add`(unstaged)的修改。
+
+`git diff HEAD`
+
+
 
 
