@@ -58,7 +58,7 @@
 
 ```git
 git add 文件名
-git commit -m "change 文件名"
+git commit -m "change 操作代号"
 ```
 
 同样，上传后，可以通过`git log`来查看这次修改操作的log
