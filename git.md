@@ -1,6 +1,8 @@
 # Git学习笔记
 
-## 初始化 
+## 创建修改版本库
+
+### 初始化 
 
 1. 设置用户名
 
@@ -18,13 +20,13 @@
 
 `git init`
 
-## 上传文件
+### 上传文件
 
-### 查看版本库状态
+#### 查看版本库状态
 
 `git status`
 
-### 添加文件(add)
+#### 添加文件(add)
 
 将没有放入版本库的文件（unstaged状态）添加进版本库（staged）
 
@@ -34,21 +36,21 @@
 
 `git add .`
 
-### 提交改变(commit)
+#### 提交改变(commit)
 
 提交这次改变，并在`-m`自定义这次改变的信息
 
 `git commit -m "create 文件名"`
 
-### 流程图
+#### 流程图
    
    ![流程图](https://morvanzhou.github.io/static/results/git/2-1-1.png)
 
-## 记录修改（log&diff）
+### 记录修改（log&diff）
 
 在Git中，每次提交（commit）的修改，都会被单独的保存起来。每个commit记录了每次添加或删改的过程。
 
-### 修改记录 log
+#### 修改记录 log
 
 查看修改记录
 
@@ -63,27 +65,29 @@ git commit -m "change 操作代号"
 
 同样，上传后，可以通过`git log`来查看这次修改操作的log
 
-### 查看 unstaged
+#### 查看 unstaged
 
 想查看还没`add`(unstaged状态)的修改部分和上个已经`commit`的文件有何不同，可以使用：
 
 `git diff`
 
-### 查看staged(--cached)
+#### 查看staged(--cached)
 
 如果已经`add`了这次修改，文件变成了“可提交状态”(staged)，我们可以在diff中添加参数`--cached`来查看修改：
 
 `git diff --cached`
 
-### 查看 unstaged&staged(HEAD)
+#### 查看 unstaged&staged(HEAD)
 
 可以通过使用`git diff HEAD`同时查看`add`过(staged)和没`add`(unstaged)的修改。
 
 `git diff HEAD`
 
-## 回到从前reset
+## 回到从前
 
-### 修改已commit的版本
+### 回到从前 reset
+
+#### 修改已commit的版本
 
 想修改上一次的commit，比如添加另一个文件，并将这个修改也commit进上一次commit。可以使用`--amend`将这次改变合并到之前的commit中。
 
@@ -98,7 +102,7 @@ c6762a1 change 1
 13be9a7 create 1.py
 ```
 
-### reset回到add之前
+#### reset回到add之前
 
 有时添加`add`了修改，但是又想补充一些内容再`add`，这时，可以通过`git reset 文件名`返回到reset之前。
 
@@ -118,7 +122,7 @@ $ git status -s
  M 1.py     # unstaged
 ```
 
-### reset回到commit之前
+#### reset回到commit之前
 
 每个 `commit` 都有自己的 `id` 数字号, `HEAD` 是一个指针, 指引当前的状态是在哪个 `commit`. 我们如果要回到过去, 就是让 `HEAD` 回到过去并 `reset` 此时的 `HEAD` 到过去的位置.
 
@@ -172,11 +176,11 @@ c6762a1 change 1
 13be9a7 create 1.py
 ```
 
-## 回到从前checkout（针对单个文件）
+### 回到从前checkout（针对单个文件）
 
 `reset` 针对的是整个版本库，如果只想某个文件回到过去，要使用`checkout`
 
-### 改写文件checkout
+#### 改写文件checkout
 
 我们仅仅要对 `1.py` 进行回到过去操作, 回到 `c6762a1 change 1` 这一个 `commit`. 使用 `checkout` + id `c6762a1` + `--` + 文件目录 ` 1.py`, 我们就能将 `1.py` 的指针 `HEAD` 放在这个时刻 `c6762a1`:
 
@@ -206,3 +210,7 @@ c6762a1 change 1
 ```
 
 可以看出，不想 `reset` 那样， `change 2` 并没有消失，但是 `1.py` 已经成功返回 `change 1` 版本并修改完成后提交 `commit`。
+
+## 分支管理
+
+
