@@ -172,3 +172,37 @@ c6762a1 change 1
 13be9a7 create 1.py
 ```
 
+## 回到从前checkout（针对单个文件）
+
+`reset` 针对的是整个版本库，如果只想某个文件回到过去，要使用`checkout`
+
+### 改写文件checkout
+
+我们仅仅要对 `1.py` 进行回到过去操作, 回到 `c6762a1 change 1` 这一个 `commit`. 使用 `checkout` + id `c6762a1` + `--` + 文件目录 ` 1.py`, 我们就能将 `1.py` 的指针 `HEAD` 放在这个时刻 `c6762a1`:
+
+```git
+$ git log --oneline
+# 输出
+904e1ba change 2
+c6762a1 change 1
+13be9a7 create 1.py
+---------------------
+$ git checkout c6762a1 -- 1.py
+# -- 后，文件名前需要用空格分开
+```
+
+这样，`1.py` 就回到了 `change 1` 版本，在此基础上，对 `1.py` 进行修改，然后 `add` 并 `commit` ：
+
+```git
+$ git add 1.py
+$ git commit -m "back to change 1 and add comment for 1.py"
+$ git log --oneline
+
+# 输出
+47f167e back to change 1 and add comment for 1.py
+904e1ba change 2
+c6762a1 change 1
+13be9a7 create 1.py
+```
+
+可以看出，不想 `reset` 那样， `change 2` 并没有消失，但是 `1.py` 已经成功返回 `change 1` 版本并修改完成后提交 `commit`。
