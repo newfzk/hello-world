@@ -81,6 +81,94 @@ git commit -m "change 操作代号"
 
 `git diff HEAD`
 
+## 回到从前reset
 
+### 修改已commit的版本
 
+想修改上一次的commit，比如添加另一个文件，并将这个修改也commit进上一次commit。可以使用`--amend`将这次改变合并到之前的commit中。
+
+```git
+$ git add 2.py
+$ git commit --amend --no-edit   # "--no-edit": 不编辑, 直接合并到上一个 commit
+$ git log --oneline    # "--oneline": 每个 commit 内容显示在一行
+
+# 输出
+904e1ba change 2    # 合并过的 change 2
+c6762a1 change 1
+13be9a7 create 1.py
+```
+
+### reset回到add之前
+
+有时添加`add`了修改，但是又想补充一些内容再`add`，这时，可以通过`git reset 文件名`返回到reset之前。
+
+```git
+$ git add 1.py
+$ git status -s # "-s": status 的缩写模式
+# 输出
+M  1.py     # staged
+-----------------------
+$ git reset 1.py
+# 输出
+Unstaged changes after reset:
+M	1.py
+-----------------------
+$ git status -s
+# 输出
+ M 1.py     # unstaged
+```
+
+### reset回到commit之前
+
+每个 `commit` 都有自己的 `id` 数字号, `HEAD` 是一个指针, 指引当前的状态是在哪个 `commit`. 我们如果要回到过去, 就是让 `HEAD` 回到过去并 `reset` 此时的 `HEAD` 到过去的位置.
+
+```git
+# 不管我们之前有没有做了一些 add 工作, 这一步让我们回到 上一次的 commit
+$ git reset --hard HEAD    
+# 输出
+HEAD is now at 904e1ba change 2
+-----------------------
+# 看看所有的log
+$ git log --oneline
+# 输出
+904e1ba change 2
+c6762a1 change 1
+13be9a7 create 1.py
+-----------------------
+# 回到 c6762a1 change 1
+# 方式1: "HEAD^"
+$ git reset --hard HEAD^  
+
+# 方式2: "commit id"
+$ git reset --hard c6762a1
+-----------------------
+# 看看现在的 log
+$ git log --oneline
+# 输出
+c6762a1 change 1
+13be9a7 create 1.py
+```
+
+那如何回到reset之前的版本change 2呢？可以通过查看`git reflog`里面最近做的所以`HEAD`的改动，并选择想挽救的`commit id`:
+
+```git
+$ git reflog
+# 输出
+c6762a1 HEAD@{0}: reset: moving to c6762a1
+904e1ba HEAD@{1}: commit (amend): change 2
+0107760 HEAD@{2}: commit: change 2
+c6762a1 HEAD@{3}: commit: change 1
+13be9a7 HEAD@{4}: commit (initial): create 1.py
+```
+
+比如想回到`commit(amend):change 2`，可以通过使用`reset`：
+
+```git
+$ git reset --hard 904e1ba
+$ git log --oneline
+# 输出
+904e1ba change 2
+c6762a1 change 1
+13be9a7 create 1.py
+```
 
