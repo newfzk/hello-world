@@ -213,4 +213,122 @@ c6762a1 change 1
 
 ## 分支管理
 
+### 分支branch
 
+通常会将主分支`master`当做稳定版本，而开发新版本或新属性时，在另外一个分支上进行，这样就能开发使用互不干扰了。
+
+#### graph
+可以通过`--graph`来观看分支：
+
+`git log --oneline --graph`
+
+#### 使用branch创建dev分支
+
+```git
+git branch dev # 建立dev分支
+git branch     # 查看当前分支
+# 输出
+  dev       
+* master    # * 代表了当前的 HEAD 所在的分支
+```
+
+想把`HEAD`切换去`dev`分支时，可以用`checkout`：
+
+```git
+git checkout dev
+# 输出
+Switched to branch 'dev'
+```
+
+使用`checkout -b` + 分支名，就能直接创建和切换到新建的分支：
+
+`git checkout -b dev`
+
+#### 将dev中的修改推送到master
+
+`dev`分支中的文件通master中是一样的，因为当前指针`HEAD`在`dev`分支上，所以现在对文件夹中的文件进行修改将不会影响到`master`分支。
+
+在`1.py`上加入一行注释`#I was changed in dev branch`，然后再`commit`：
+
+```git 
+git commit -am "change 3 in dev"
+# "-am": add所有改变，并直接commit
+```
+
+在开发版`dev`更新好后，就要将`dev`中的修改推送到`master`中了。
+
+首先要切换到`master`，在将`dev`推送过来。
+
+```git
+git checkout master # 切换至master才能将其他分支合并过来
+
+git merge dev # 将dev merge合并到master中
+$ git log --oneline --graph
+
+# 输出
+* f9584f8 change 3 in dev
+* 47f167e back to change 1 and add comment for 1.py
+* 904e1ba change 2
+* c6762a1 change 1
+* 13be9a7 create 1.py
+```
+
+要注意，直接`git merge dev`，Git会默认采用`Fast forward`格式进行`merge`，这样`merge`的这次操作不会有`commit`信息。`log`中也不会有分支的图案，我们可以采用`--no-ff`这种方式保留`merge`的`commit`信息。
+
+```git
+$ git merge --no-ff -m "keep merge info" dev         # 保留 merge 信息
+$ git log --oneline --graph
+
+# 输出
+*   c60668f keep merge info
+|\  
+| * f9584f8 change 3 in dev         # 这里就能看出, 我们建立过一个分支
+|/  
+* 47f167e back to change 1 and add comment for 1.py
+* 904e1ba change 2
+* c6762a1 change 1
+* 13be9a7 create 1.py
+```
+
+### merge 分支冲突
+
+假设有人在做开发版`dev`的更新，还有人在修改`master`中的一些bug。当我们再`merge dev`的时候，冲突就出现了。因为git不知道应该怎么处理`merge`时，在`master`和`dev`的不同修改。
+
+现在在创建一个分支后，同时对两个分支都进行修改。比如：
+
+- 在`master`中的`1.py`加上`# edited in master`
+- 在`dev`中的`1.py`加上`# edited in dev`
+
+如果直接`merge dev`到`master`的时候：
+
+```git
+$ git merge dev
+
+# 输出
+Auto-merging 1.py
+CONFLICT (content): Merge conflict in 1.py
+Automatic merge failed; fix conflicts and then commit the result.
+```
+
+git会发现`1.py`在`master`和`dev`上的版本不同，所以提示`merge`有冲突。具体的冲突，git会帮助我们标记出来，打开`1.py`就能看到。我们只需要手动合并一下两者的不同，然后再`commit`冲突就解决了。
+
+再来看看`master`的`log`：
+
+```git
+$ git log --oneline --graph
+
+# 输出
+*   7810065 solve conflict
+|\  
+| * f7d2e3a change 3 in dev
+* | 3d7796e change 4 in master
+|/  
+* 47f167e back to change 1 and add comment for 1.py
+* 904e1ba change 2
+* c6762a1 change 1
+* 13be9a7 create 1.py
+```
+
+### rebase 分支冲突
+
+### 临时修改stash
