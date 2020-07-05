@@ -331,4 +331,101 @@ $ git log --oneline --graph
 
 ### rebase 分支冲突
 
+初始版本库如同上节，在`master`和`dev`分支中都有自己的独立修改。
+
+```git
+# 这是 master 的 log
+* 3d7796e change 4 in master # 这一条 commit 和 dev 的不一样
+* 47f167e back to change 1 and add comment for 1.py
+* 904e1ba change 2
+* c6762a1 change 1
+* 13be9a7 create 1.py
+-----------------------------
+# 这是 dev 的 log
+* f7d2e3a change 3 in dev   # 这一条 commit 和 master 的不一样
+* 47f167e back to change 1 and add comment for 1.py
+* 904e1ba change 2
+* c6762a1 change 1
+* 13be9a7 create 1.py
+```
+
+使用`rebase`合并`dev`到`master`
+
+```git
+$ git branch
+
+# 输出
+  dev
+* master
+-------------------------
+$ git rebase dev 
+
+# 输出
+First, rewinding head to replay your work on top of it...
+Applying: change 3 in dev
+Using index info to reconstruct a base tree...
+M	1.py
+Falling back to patching base and 3-way merge...
+Auto-merging 1.py
+CONFLICT (content): Merge conflict in 1.py
+error: Failed to merge in the changes.
+Patch failed at 0001 change 3 in dev
+The copy of the patch that failed is found in: .git/rebase-apply/patch
+
+When you have resolved this problem, run "git rebase --continue".
+If you prefer to skip this patch, run "git rebase --skip" instead.
+To check out the original branch and stop rebasing, run "git rebase --abort".
+```
+
+`git`提示，发现`1.py`在`master`和`dev`上版本不同，所以提示`merge`有冲突。具体的冲突，git已经帮我们标记出来，我们打开`1.py`就能看到：
+
+```python
+a = 1
+# I went back to change 1
+<<<<<<< f7d2e3a047be4624e83c1265a0946e2e8790f79c
+# edited in dev
+=======
+# edited in master
+>>>>>>> change 4 in master
+```
+
+这时，`HEAD`并没有指向`master`或者`dev`，而是停在了`rebase`模式上：
+
+```git
+$ git branch
+* (no branch, rebasing master) # HEAD 在这
+  dev
+  master
+```
+
+所以我们打开`1.py`，手动合并一下两者的不同。然后执行`git add`和`git rebase --continue`就完成了`rebase`操作了。
+
+```git
+$ git add 1.py
+$ git rebase --continue
+```
+
+最后在看一下`master`的`log`：
+
+```git
+$ git log --oneline --graph
+
+# 输出
+* c844cb1 change 4 in master    # 这条 commit 原本的id=3d7796e, 所以 master 的历史被修改
+* f7d2e3a change 3 in dev       # rebase 过来的 dev commit
+* 47f167e back to change 1 and add comment for 1.py
+* 904e1ba change 2
+* c6762a1 change 1
+* 13be9a7 create 1.py
+```
+
+**!!注意!!** 这个例子也说明了使用`rebase`要万分小心，千万不要在共享的`branch`中`rebase`，不让就像上面一样，`master`的历史已经被`rebase`改变了。
+
+如果真的不小心弄错了，可以使用`reset`这一节提到的`reflog`恢复。
+
 ### 临时修改stash
+
+#### 暂存修改
+
+假设我们现在在`dev`分支上快乐的改代码：
+`
