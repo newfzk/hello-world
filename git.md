@@ -425,7 +425,108 @@ $ git log --oneline --graph
 
 ### 临时修改stash
 
-#### 暂存修改
+#### 暂存修改 stash
 
 假设我们现在在`dev`分支上快乐的改代码：
-`
+
+`git checkout dev`
+
+在`dev`中的`1.py`中加上一行`#feel happy`，然后老板的电话来了，可是我还没有改完这些代码，所以我就用`stash`将这些改变暂时放在一边。
+
+```git
+$ git status -s
+# 输出
+ M 1.py
+------------------ 
+$ git stash
+# 输出
+Saved working directory and index state WIP on dev: f7d2e3a change 3 in dev
+HEAD is now at f7d2e3a change 3 in dev
+-------------------
+$ git status
+# 输出
+On branch dev
+nothing to commit, working directory clean  # 干净得很
+```
+
+#### 做其他任务
+
+然后我们建立另一个`branch`用来完成老板的任务：
+```git
+$ git checkout -b boss
+
+# 输出
+Switched to a new branch 'boss' # 创建并切换到 boss
+```
+
+苦逼的做完老板的任务，如添加`#lovely boss`去`1.py`然后`commit`，完成老板的任务。
+```git
+$ git commit -am "job from boss"
+$ git checkout master
+$ git merge --no-ff -m "merged boss job" boss
+```
+
+通过以下步骤完成老板的任务，并观看一下`master`的log：
+```git
+$ git commit -am "solve conflict"
+$ git log --oneline --graph
+*   1536bea solve conflict
+|\  
+| * 27ba884 job from boss
+* | 2d1961f change 4 in master
+|/  
+* f7d2e3a change 3 in dev
+* 47f167e back to change 1 and add comment for 1.py
+* 904e1ba change 2
+* c6762a1 change 1
+* 13be9a7 create 1.py
+```
+
+#### 回复暂存
+
+现在可以恢复暂存，继续开心的在`dev`上刷代码了。
+
+```git
+$ git checkout dev
+$ git stash list    # 查看在 stash 中的缓存
+
+# 输出
+stash@{0}: WIP on dev: f7d2e3a change 3 in dev
+```
+
+上面说明在`dev`中，我们的确有`stash`的工作。现在可以通过`pop`来提取这个并继续工作了。
+```git
+$ git stash pop
+
+# 输出
+On branch dev
+Changes not staged for commit:
+  (use "git add <file>..." to update what will be committed)
+  (use "git checkout -- <file>..." to discard changes in working directory)
+
+	modified:   1.py
+
+no changes added to commit (use "git add" and/or "git commit -a")
+Dropped refs/stash@{0} (23332b7edc105a579b09b127336240a45756a91c)
+----------------------
+$ git status -s
+# 输出
+ M 1.py     # 和最开始一样了
+```
+
+## Github在线代码管理
+
+#### 连接本地版本库
+
+```git
+$ git remote add origin repository的URL
+```
+
+#### 推送修改
+
+如果在本地再进行修改，然后`commit`并`push`上去。
+
+```git 
+$ git commit -am "change 5"
+$ git push -u origin master
+```
